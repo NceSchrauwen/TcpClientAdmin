@@ -8,8 +8,6 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.*
 import kotlinx.coroutines.*
-import com.example.tcpclientadmin.TcpClient
-//import com.example.tcpclientadmin.ui.theme.TcpClientAdminTheme
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,8 +40,6 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val ip = SettingsManager.getIp(this@MainActivity)
                     val connected = TcpSession.connect(ip, port)
-//                    val message = "LOGIN,$userId,$password"
-//                    val response = TcpClient.sendMessage(ip, port, message)
 
                     if (!connected) {
                         withContext(Dispatchers.Main) {
@@ -56,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                     val response = TcpSession.sendMessage(loginMessage)
                     Log.d("TCP", "Server response: $response")
 
+//                  TODO: Add username to the approval activity screen
                     withContext(Dispatchers.Main) {
                         if (response?.startsWith("LOGIN_SUCCESS") == true) {
 //                            val username = response.split(",")[1]
@@ -63,7 +60,6 @@ class MainActivity : AppCompatActivity() {
                             val intent = Intent(this@MainActivity, ApprovalActivity::class.java)
                             startActivity(intent)
                             resultTextView.setText("Login successful: $response")
-//                            finish() // optional: closes login screen
                         } else {
                             resultTextView.setText("Login not successful: $response")
                             TcpSession.close()

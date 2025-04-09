@@ -7,8 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.BufferedWriter
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 import java.net.Socket
 
 class ApprovalActivity : AppCompatActivity() {
@@ -16,6 +14,7 @@ class ApprovalActivity : AppCompatActivity() {
     private lateinit var requestText: TextView
     private lateinit var approveBtn: Button
     private lateinit var denyBtn: Button
+    private lateinit var retryBtn: Button
 
     private var socket: Socket? = null
     private var writer: BufferedWriter? = null
@@ -29,11 +28,26 @@ class ApprovalActivity : AppCompatActivity() {
         requestText = findViewById(R.id.requestText)
         approveBtn = findViewById(R.id.approveButton)
         denyBtn = findViewById(R.id.denyButton)
+        retryBtn = findViewById(R.id.retryButton)
 
         approveBtn.isEnabled = false
         denyBtn.isEnabled = false
 
         val ip = SettingsManager.getIp(this)
+
+        retryBtn.setOnClickListener {
+            GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    TcpSession.writer?.write("FETCH_LATEST")
+                    TcpSession.writer?.newLine()
+                    TcpSession.writer?.flush()
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        requestText.text = "Error sending fetch request: ${e.message}"
+                    }
+                }
+            }
+        }
 
         GlobalScope.launch(Dispatchers.IO) {
             try {
@@ -42,7 +56,7 @@ class ApprovalActivity : AppCompatActivity() {
                     val line = reader?.readLine()
                     if (line == "NONSCAN_REQUEST") {
                         withContext(Dispatchers.Main) {
-                            requestText.text = "Non-scan approval request received."
+                            requestText.text = "Non-scan approval is request received!"
                             approveBtn.isEnabled = true
                             denyBtn.isEnabled = true
                         }
@@ -94,9 +108,4 @@ class ApprovalActivity : AppCompatActivity() {
             }
         }
     }
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-////        TcpSession.close()
-//    }
 }
