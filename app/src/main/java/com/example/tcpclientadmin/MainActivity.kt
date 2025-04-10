@@ -1,5 +1,6 @@
 package com.example.tcpclientadmin
 
+import SessionManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,18 +10,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.*
 import kotlinx.coroutines.*
 
-
 class MainActivity : AppCompatActivity() {
     private lateinit var userIdEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var resultTextView: TextView
 
+    private lateinit var sessionManager: SessionManager
+
     private val port = 12345
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        sessionManager = SessionManager(this)
 
         userIdEditText = findViewById(R.id.userIdEditText)
         passwordEditText = findViewById(R.id.passwordEditText)
@@ -55,9 +59,11 @@ class MainActivity : AppCompatActivity() {
 //                  TODO: Add username to the approval activity screen
                     withContext(Dispatchers.Main) {
                         if (response?.startsWith("LOGIN_SUCCESS") == true) {
-//                            val username = response.split(",")[1]
-//                            resultTextView.text = "Login successful: $username"
+                            val username = response.split(",")[1]
+//                          Set the user's login state
+                            sessionManager.setLogin(true)
                             val intent = Intent(this@MainActivity, ApprovalActivity::class.java)
+                            intent.putExtra("username", username)
                             startActivity(intent)
                             resultTextView.setText("Login successful: $response")
                         } else {

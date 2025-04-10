@@ -5,6 +5,14 @@
     android:gravity="center" android:padding="24dp">
 
     <TextView
+        android:id="@+id/welcomeWorker"
+        android:text=" "
+        android:textSize="20sp"
+        android:layout_marginBottom="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:id="@+id/requestText"
         android:text="-- No non-scan request at this moment --"
         android:textSize="20sp"
@@ -33,4 +41,13 @@
         android:layout_marginTop="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/logoutButton"
+        android:text="Logout"
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
 </LinearLayout>

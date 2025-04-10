@@ -19,10 +19,4 @@ object SettingsManager {
         return json.getString("ip")
     }
 
-//    fun setIp(context: Context, ip: String) {
-//        val file = File(context.filesDir, SETTINGS_FILE)
-//        val json = JSONObject()
-//        json.put("ip", ip)
-//        file.writeText(json.toString())
-//    }
 }

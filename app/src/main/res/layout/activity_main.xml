@@ -10,14 +10,14 @@
     <EditText
         android:id="@+id/userIdEditText"
         android:hint="User ID"
-        android:inputType="text"
+        android:inputType="number"
         android:layout_width="match_parent"
         android:layout_height="48dp" />
 
     <EditText
         android:id="@+id/passwordEditText"
         android:hint="Password"
-        android:inputType="textPassword"
+        android:inputType="numberPassword"
         android:layout_width="match_parent"
         android:layout_height="48dp" />
 
@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/resultTextView"
-        android:text="Result will appear here"
+        android:text=" "
         android:layout_marginTop="16dp"
         android:textSize="18sp"
         android:layout_width="match_parent"
