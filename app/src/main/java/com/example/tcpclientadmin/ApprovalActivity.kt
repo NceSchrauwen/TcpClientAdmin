@@ -26,6 +26,8 @@ class ApprovalActivity : AppCompatActivity() {
     private var reader: BufferedReader? = null
     private val port = 12345
 
+    var lastPongTime = System.currentTimeMillis()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.approval_activity)
@@ -100,12 +102,21 @@ class ApprovalActivity : AppCompatActivity() {
                 val reader = TcpSession.reader
                 while (true) {
                     val line = reader?.readLine()
-                    if (line == "NONSCAN_REQUEST") {
+
+                    if (line == "PONG"){
+                        lastPongTime = System.currentTimeMillis()
+                    } else if (line == "NONSCAN_REQUEST") {
                         withContext(Dispatchers.Main) {
                             requestText.text = "Non-scan approval is request received!"
                             approveBtn.isEnabled = true
                             denyBtn.isEnabled = true
                         }
+                    } else if (line == "LOGOUT") {
+                        withContext(Dispatchers.Main) {
+                            requestText.text = "Disconnected by server"
+                            logout()
+                        }
+                        break
                     }
                 }
             } catch (e: Exception) {
@@ -115,6 +126,33 @@ class ApprovalActivity : AppCompatActivity() {
             }
         }
 
+        // 2. Ping loop
+        GlobalScope.launch(Dispatchers.IO) {
+            while (true) {
+                try {
+                    TcpSession.writer?.write("PING")
+                    TcpSession.writer?.newLine()
+                    TcpSession.writer?.flush()
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        requestText.text = "Ping error: ${e.message}"
+                        logout()
+                    }
+                    break
+                }
+
+                // 3. Check if it's been more than 6s since last PONG
+                if (System.currentTimeMillis() - lastPongTime > 6000) {
+                    withContext(Dispatchers.Main) {
+                        requestText.text = "Connection lost (no PONG received). Logging out."
+                        logout()
+                    }
+                    break
+                }
+
+                delay(1000) // Check every 1s
+            }
+        }
 
         approveBtn.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {

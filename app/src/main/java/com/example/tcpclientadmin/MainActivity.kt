@@ -40,7 +40,13 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+
+
             GlobalScope.launch(Dispatchers.IO) {
+                withContext(Dispatchers.Main) {
+                    resultTextView.text = "Attempting connection..."
+                }
+
                 try {
                     val ip = SettingsManager.getIp(this@MainActivity)
                     val connected = TcpSession.connect(ip, port)
@@ -56,7 +62,6 @@ class MainActivity : AppCompatActivity() {
                     val response = TcpSession.sendMessage(loginMessage)
                     Log.d("TCP", "Server response: $response")
 
-//                  TODO: Add username to the approval activity screen
                     withContext(Dispatchers.Main) {
                         if (response?.startsWith("LOGIN_SUCCESS") == true) {
                             val username = response.split(",")[1]
@@ -66,6 +71,8 @@ class MainActivity : AppCompatActivity() {
                             intent.putExtra("username", username)
                             startActivity(intent)
                             resultTextView.setText("Login successful: $response")
+                        } else if (response.isNullOrEmpty()){
+                            resultTextView.setText("Server is not responding")
                         } else {
                             resultTextView.setText("Login not successful: $response")
                             TcpSession.close()
@@ -73,7 +80,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
-                        resultTextView.text = "Error: ${e.message}"
+                        resultTextView.text = "❌ Exception: ${e.message}"
+                        Log.e("TCP", "Exception during login", e)
                     }
                 }
             }

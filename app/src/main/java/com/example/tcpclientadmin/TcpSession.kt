@@ -1,6 +1,8 @@
 package com.example.tcpclientadmin
 
+import android.util.Log
 import java.io.*
+import java.net.InetSocketAddress
 import java.net.Socket
 
 object TcpSession {
@@ -10,11 +12,15 @@ object TcpSession {
 
     fun connect(ip: String, port: Int): Boolean {
         return try {
-            socket = Socket(ip, port)
+            val sock = Socket()
+            sock.connect(InetSocketAddress(ip, port), 2000)
+            socket = sock
             writer = BufferedWriter(OutputStreamWriter(socket!!.getOutputStream()))
             reader = BufferedReader(InputStreamReader(socket!!.getInputStream()))
+            Log.d("TCP", "Connected to $ip:$port ✅")
             true
         } catch (e: Exception) {
+            Log.e("TCP", "Failed to connect to $ip:$port ❌", e)
             false
         }
     }
