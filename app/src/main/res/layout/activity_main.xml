@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/resultTextView"
-        android:text=" "
+        android:text=""
         android:layout_marginTop="16dp"
         android:textSize="18sp"
         android:layout_width="match_parent"
